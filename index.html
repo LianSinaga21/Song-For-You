@@ -376,7 +376,7 @@
     font-family: 'Playfair Display', serif;
     font-weight: 600;
     font-size: 40px;
-    margin: 0 0 6px;
+    margin: 0 0 26px;
     color: var(--ink);
   }
   .days-together{
@@ -395,6 +395,24 @@
   }
   .reel{ transform-origin: center; animation: spin 6s linear infinite paused; }
   .playing .reel{ animation-play-state: running; }
+
+  /* mata kaset yang kedip-kedip pas lagi nggak muter */
+  .eyelid{
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scaleY(0.04);
+  }
+  .mixtapeCard:not(.playing) .eyelid{
+    animation: blinkEye 4.4s ease-in-out infinite;
+  }
+  .mixtapeCard.playing .eyelid{
+    animation: none;
+    transform: scaleY(0.04);
+  }
+  @keyframes blinkEye{
+    0%, 88%, 100%{ transform: scaleY(0.04); }
+    91%, 95%{ transform: scaleY(1); }
+  }
 
   /* not musik melayang pas lagu main */
   .note-field{ position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:5; }
@@ -683,9 +701,7 @@
 
       <div class="card" id="mixtapeCard">
         <button class="reset-btn" id="resetBtn">↺ Tutup lagi</button>
-        <div class="eyebrow" id="eyebrow">FOR <b>Sam</b> · FROM <b>Yan</b></div>
         <h1 class="title">Songs for you</h1>
-        <div class="days-together" id="daysTogether"></div>
 
         <div class="cassette-wrap">
           <div class="note-field" id="noteField"></div>
@@ -700,19 +716,25 @@
             <g class="reel" style="transform-origin:80px 121px;">
               <circle cx="80" cy="121" r="28" fill="#f2ecd8" stroke="#8d886b" stroke-width="2"/>
               <circle cx="80" cy="121" r="9" fill="#3b352a"/>
+              <circle cx="77" cy="118" r="2" fill="#faf5ea" opacity="0.9"/>
+              <ellipse class="eyelid" cx="80" cy="121" rx="9.5" ry="9.5" fill="#f2ecd8"/>
               <circle cx="65" cy="108" r="2.4" fill="#8d886b"/>
               <circle cx="95" cy="108" r="2.4" fill="#8d886b"/>
               <circle cx="65" cy="134" r="2.4" fill="#8d886b"/>
               <circle cx="95" cy="134" r="2.4" fill="#8d886b"/>
             </g>
+            <ellipse cx="58" cy="141" rx="7" ry="4" fill="#d68f92" opacity="0.3" transform="rotate(-12 58 141)"/>
             <g class="reel" style="transform-origin:220px 121px;">
               <circle cx="220" cy="121" r="28" fill="#f2ecd8" stroke="#8d886b" stroke-width="2"/>
               <circle cx="220" cy="121" r="9" fill="#3b352a"/>
+              <circle cx="217" cy="118" r="2" fill="#faf5ea" opacity="0.9"/>
+              <ellipse class="eyelid" cx="220" cy="121" rx="9.5" ry="9.5" fill="#f2ecd8"/>
               <circle cx="205" cy="108" r="2.4" fill="#8d886b"/>
               <circle cx="235" cy="108" r="2.4" fill="#8d886b"/>
               <circle cx="205" cy="134" r="2.4" fill="#8d886b"/>
               <circle cx="235" cy="134" r="2.4" fill="#8d886b"/>
             </g>
+            <ellipse cx="242" cy="141" rx="7" ry="4" fill="#d68f92" opacity="0.3" transform="rotate(12 242 141)"/>
             <rect x="118" y="112" width="64" height="18" fill="#3b352a"/>
 
             <circle cx="20" cy="18" r="4" fill="#8d886b"/>
@@ -865,15 +887,6 @@
   const nowPlaying = document.getElementById('nowPlaying');
   const mixtapeCard = document.getElementById('mixtapeCard');
   const noteField = document.getElementById('noteField');
-
-  // ganti tanggal ini ke tanggal jadian kamu (format: TAHUN, BULAN-1, TANGGAL)
-  // bulan dimulai dari 0, jadi Januari = 0, Februari = 1, dst.
-  const anniversaryDate = new Date(2023, 0, 1); // contoh: 1 Januari 2023
-  const daysTogetherEl = document.getElementById('daysTogether');
-  const dayCount = Math.floor((new Date() - anniversaryDate) / (1000 * 60 * 60 * 24));
-  if (dayCount >= 0) {
-    daysTogetherEl.textContent = `sudah ${dayCount.toLocaleString('id-ID')} hari kita bareng`;
-  }
 
   let noteInterval = null;
   function spawnNote(){
