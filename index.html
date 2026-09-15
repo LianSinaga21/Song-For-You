@@ -53,7 +53,7 @@
   }
   .stage.scene-card .wallpaper{ opacity: 1; }
 
-  .wallpaper svg{ position:absolute; inset:0; width:100%; height:100%; opacity:0.5; }
+  .wallpaper svg{ position:absolute; inset:0; width:100%; height:100%; opacity:0.38; }
 
   /* ---------- Scene 1: envelope ---------- */
   .envelope-scene{
@@ -503,13 +503,54 @@
   .stage.scene-card .heart-btn{ opacity: 1; pointer-events:auto; }
   .heart-btn:hover{ transform: scale(1.08); }
   .heart-btn.liked{ color:#ff5c68; }
+
+  /* ledakan hati pas tombol ♥ ditekan */
+  .heart-particle{
+    position:absolute;
+    left:50%; top:50%;
+    opacity:0;
+    pointer-events:none;
+    animation: heartPop 1s ease forwards;
+  }
+  @keyframes heartPop{
+    0%{ opacity:0; transform: translate(-50%,-50%) scale(0.3) rotate(0deg); }
+    18%{ opacity:1; }
+    100%{ opacity:0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1) rotate(var(--rot)); }
+  }
 </style>
 </head>
 <body>
 
 <div class="stage" id="stage">
 
-  <div class="wallpaper" id="wallpaper"></div>
+  <div class="wallpaper" id="wallpaper">
+    <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="floralPattern" width="150" height="170" patternUnits="userSpaceOnUse" patternTransform="rotate(6)">
+          <path d="M22 170 C22 138, 16 116, 27 88" stroke="#97a17c" stroke-width="1.3" fill="none"/>
+          <path d="M27 88 C27 72, 16 60, 5 48" stroke="#97a17c" stroke-width="1.1" fill="none"/>
+          <path d="M27 88 C27 72, 38 60, 49 48" stroke="#97a17c" stroke-width="1.1" fill="none"/>
+          <path d="M27 118 C27 108, 18 102, 10 96" stroke="#97a17c" stroke-width="1" fill="none"/>
+          <path d="M27 118 C27 108, 36 102, 44 96" stroke="#97a17c" stroke-width="1" fill="none"/>
+          <circle cx="5" cy="48" r="4.4" fill="#d68f92"/>
+          <circle cx="49" cy="48" r="4" fill="#e3c08a"/>
+          <circle cx="27" cy="60" r="3" fill="#c9a06a"/>
+          <circle cx="10" cy="96" r="2.6" fill="#e7c9a0"/>
+          <circle cx="44" cy="96" r="2.6" fill="#d9a6ab"/>
+
+          <path d="M112 30 C112 58, 106 76, 117 100" stroke="#97a17c" stroke-width="1.2" fill="none"/>
+          <path d="M117 100 C117 112, 108 118, 98 124" stroke="#97a17c" stroke-width="1" fill="none"/>
+          <circle cx="117" cy="100" r="4" fill="#d9a6ab"/>
+          <circle cx="98" cy="124" r="2.8" fill="#97a17c"/>
+          <circle cx="112" cy="30" r="3.4" fill="#c9a06a"/>
+
+          <path d="M75 150 C82 140, 92 138, 100 144" stroke="#97a17c" stroke-width="0.9" fill="none"/>
+          <circle cx="100" cy="144" r="2.2" fill="#e3c08a"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#floralPattern)"/>
+    </svg>
+  </div>
 
   <!-- Scene 1: envelope -->
   <div class="envelope-scene" id="envelopeScene">
@@ -815,11 +856,33 @@
   }
 
   
+  function spawnHearts(){
+    const colors = ['#ff5c68', '#e7889a', '#d68f92', '#f0a8b4'];
+    for (let i = 0; i < 12; i++){
+      const h = document.createElement('span');
+      h.className = 'heart-particle';
+      h.textContent = '♥';
+      const angle = (-Math.PI/2) + (Math.random() - 0.5) * Math.PI * 1.2;
+      const dist = 36 + Math.random() * 70;
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      h.style.setProperty('--tx', `${tx}px`);
+      h.style.setProperty('--ty', `${ty}px`);
+      h.style.setProperty('--rot', `${(Math.random() * 80) - 40}deg`);
+      h.style.color = colors[Math.floor(Math.random() * colors.length)];
+      h.style.fontSize = `${12 + Math.random() * 10}px`;
+      h.style.animationDelay = `${Math.random() * 0.15}s`;
+      heartBtn.appendChild(h);
+      setTimeout(() => h.remove(), 1300);
+    }
+  }
+
   // ---- tombol ♥ kiri bawah: buka/tutup panel player ----
   // Klik pertama: kalau belum ada lagu yang jalan, otomatis putar lagu
   // pertama dan buka panelnya. Klik lagi: cuma toggle buka/tutup panel.
   heartBtn.addEventListener('click', () => {
     heartBtn.classList.toggle('liked');
+    spawnHearts();
 
     if (!activeBtn) {
       const firstRow = tracklistEl.querySelector('.track-row');
