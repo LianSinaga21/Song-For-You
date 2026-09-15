@@ -128,6 +128,17 @@
     position:absolute; left:50%; top:40%; transform: translate(-50%,-50%);
     width: 70px; z-index: 4; opacity: 0.9;
   }
+  .envelope-label{
+    position:absolute;
+    left:50%; bottom: 20px;
+    transform: translateX(-50%);
+    font-family: 'Caveat', cursive;
+    font-size: 21px;
+    color: var(--rose-deep);
+    letter-spacing: 0.3px;
+    z-index: 2;
+    pointer-events: none;
+  }
   .tap-hint{
     font-family: 'Caveat', cursive;
     font-size: 22px;
@@ -343,12 +354,36 @@
     margin-bottom: 6px;
   }
   .eyebrow b{ color: var(--rose-deep); font-weight:600; }
+
+  .reset-btn{
+    position: absolute;
+    top: 18px; right: 18px;
+    background: rgba(151,161,124,0.16);
+    color: var(--sage-deep);
+    border: none;
+    border-radius: 999px;
+    padding: 6px 13px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: background .2s ease;
+    z-index: 5;
+  }
+  .reset-btn:hover{ background: rgba(151,161,124,0.3); }
   h1.title{
     font-family: 'Playfair Display', serif;
     font-weight: 600;
     font-size: 40px;
-    margin: 0 0 26px;
+    margin: 0 0 6px;
     color: var(--ink);
+  }
+  .days-together{
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--rose-deep);
+    margin: 0 0 26px;
   }
 
   .cassette-wrap{ display:flex; justify-content:center; margin-bottom: 30px; position: relative; }
@@ -606,6 +641,7 @@
         <circle cx="42" cy="12" r="4" fill="#e7c9a0"/>
       </svg>
       <div class="envelope-flap"></div>
+      <div class="envelope-label">For Vinny</div>
     </div>
     <div class="tap-hint">Ketuk untuk membuka</div>
   </div>
@@ -646,7 +682,10 @@
       </div>
 
       <div class="card" id="mixtapeCard">
+        <button class="reset-btn" id="resetBtn">↺ Tutup lagi</button>
+        <div class="eyebrow" id="eyebrow">FOR <b>Sam</b> · FROM <b>Yan</b></div>
         <h1 class="title">Songs for you</h1>
+        <div class="days-together" id="daysTogether"></div>
 
         <div class="cassette-wrap">
           <div class="note-field" id="noteField"></div>
@@ -827,6 +866,15 @@
   const mixtapeCard = document.getElementById('mixtapeCard');
   const noteField = document.getElementById('noteField');
 
+  // ganti tanggal ini ke tanggal jadian kamu (format: TAHUN, BULAN-1, TANGGAL)
+  // bulan dimulai dari 0, jadi Januari = 0, Februari = 1, dst.
+  const anniversaryDate = new Date(2023, 0, 1); // contoh: 1 Januari 2023
+  const daysTogetherEl = document.getElementById('daysTogether');
+  const dayCount = Math.floor((new Date() - anniversaryDate) / (1000 * 60 * 60 * 24));
+  if (dayCount >= 0) {
+    daysTogetherEl.textContent = `sudah ${dayCount.toLocaleString('id-ID')} hari kita bareng`;
+  }
+
   let noteInterval = null;
   function spawnNote(){
     const symbols = ['♪', '♫', '♬'];
@@ -901,9 +949,43 @@
     startNoteFloat();
   }
 
+  // ---- efek suara pas amplop dibuka (dibikin langsung pakai kode,
+  // bukan file audio, biar nggak gantung ke link luar yang bisa putus) ----
+  function playRustleSound(){
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const duration = 0.35;
+      const bufferSize = Math.floor(ctx.sampleRate * duration);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++){
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.value = 2200;
+      bandpass.Q.value = 0.6;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
+      noise.connect(bandpass).connect(gain).connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime + duration);
+    } catch (e) {
+      // browser nggak support Web Audio API / diblokir — dilewat aja, nggak fatal
+    }
+  }
+
   // ---- scene 1 -> 2: buka amplop ----
   envelope.addEventListener('click', () => {
     if (stage.classList.contains('scene-bloom') || stage.classList.contains('scene-card')) return;
+    playRustleSound();
     envelope.classList.add('open');
     setTimeout(() => {
       spawnPetals();
@@ -974,6 +1056,30 @@
 
     sideStack.classList.toggle('visible');
     sidePlayer.classList.toggle('visible');
+  });
+  // ---- tombol "↺ Tutup lagi": balikin ke amplop tertutup ----
+  const resetBtn = document.getElementById('resetBtn');
+  resetBtn.addEventListener('click', () => {
+    stage.classList.remove('scene-bloom', 'scene-card');
+    envelope.classList.remove('open');
+    petalBurst.innerHTML = '';
+
+    spotifyFrame.src = '';
+    youtubeFrame.src = '';
+    spotifyWrap.style.display = 'none';
+    youtubeWrap.style.display = 'none';
+    playerEmptyHint.style.display = 'block';
+    sideStack.classList.remove('visible');
+    sidePlayer.classList.remove('visible');
+    mixtapeCard.classList.remove('playing');
+    heartBtn.classList.remove('liked');
+
+    if (activeBtn) { activeBtn.classList.remove('active'); activeBtn.textContent = '▶'; activeBtn = null; }
+    if (activeRow) { activeRow.classList.remove('active-row'); activeRow = null; }
+    if (noteInterval) { clearInterval(noteInterval); noteInterval = null; }
+    nowPlaying.innerHTML = `Mulai dari: <b>${tracks[0].name}</b>`;
+
+    window.scrollTo({ top: 0, behavior: 'auto' });
   });
 </script>
 
