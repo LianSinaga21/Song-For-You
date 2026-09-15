@@ -55,6 +55,29 @@
 
   .wallpaper svg{ position:absolute; inset:0; width:100%; height:100%; opacity:0.38; }
 
+  /* kunang-kunang mengambang halus */
+  .firefly-field{ position:absolute; inset:0; pointer-events:none; z-index:1; }
+  .firefly{
+    position:absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f5e2a8 0%, rgba(245,226,168,0.55) 45%, transparent 72%);
+    box-shadow: 0 0 9px 2px rgba(245,226,168,0.5);
+    opacity: 0;
+    animation: fireflyFloat var(--dur) ease-in-out infinite, fireflyFlicker var(--flicker) ease-in-out infinite;
+  }
+  @keyframes fireflyFloat{
+    0%{ transform: translate(0,0); }
+    25%{ transform: translate(var(--dx1), var(--dy1)); }
+    50%{ transform: translate(var(--dx2), var(--dy2)); }
+    75%{ transform: translate(var(--dx3), var(--dy3)); }
+    100%{ transform: translate(0,0); }
+  }
+  @keyframes fireflyFlicker{
+    0%, 100%{ opacity: 0.12; }
+    50%{ opacity: 0.8; }
+  }
+
   /* ---------- Scene 1: envelope ---------- */
   .envelope-scene{
     position:absolute; inset:0;
@@ -328,7 +351,7 @@
     color: var(--ink);
   }
 
-  .cassette-wrap{ display:flex; justify-content:center; margin-bottom: 30px; }
+  .cassette-wrap{ display:flex; justify-content:center; margin-bottom: 30px; position: relative; }
   .cassette{
     width: 300px;
     max-width: 100%;
@@ -337,6 +360,23 @@
   }
   .reel{ transform-origin: center; animation: spin 6s linear infinite paused; }
   .playing .reel{ animation-play-state: running; }
+
+  /* not musik melayang pas lagu main */
+  .note-field{ position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:5; }
+  .music-note{
+    position:absolute;
+    bottom: 42%;
+    font-family:'Playfair Display', serif;
+    font-size: 19px;
+    color: var(--rose-deep);
+    opacity: 0;
+    animation: noteFloat 2.6s ease-out forwards;
+  }
+  @keyframes noteFloat{
+    0%{ opacity:0; transform: translateY(0) translateX(0) scale(0.6) rotate(0deg); }
+    15%{ opacity:0.9; }
+    100%{ opacity:0; transform: translateY(-110px) translateX(var(--nx)) scale(1.05) rotate(var(--nrot)); }
+  }
 
   .content-grid{
     display:grid; grid-template-columns: 1.3fr 1fr; gap: 26px;
@@ -550,6 +590,7 @@
       </defs>
       <rect width="100%" height="100%" fill="url(#floralPattern)"/>
     </svg>
+    <div class="firefly-field" id="fireflyField"></div>
   </div>
 
   <!-- Scene 1: envelope -->
@@ -608,6 +649,7 @@
         <h1 class="title">Songs for you</h1>
 
         <div class="cassette-wrap">
+          <div class="note-field" id="noteField"></div>
           <svg class="cassette" id="cassette" viewBox="0 0 300 190" fill="none">
             <rect x="4" y="4" width="292" height="182" rx="14" fill="#a6ac86" stroke="#7d845f" stroke-width="2"/>
             <rect x="20" y="18" width="260" height="60" rx="8" fill="#f2ecd8" stroke="#c9c2a3"/>
@@ -674,6 +716,25 @@
   const heartBtn = document.getElementById('heartBtn');
   const sideStack = document.getElementById('sideStack');
   const bouquetPhoto = document.getElementById('bouquetPhoto');
+
+  // kunang-kunang mengambang halus di background
+  const fireflyField = document.getElementById('fireflyField');
+  for (let i = 0; i < 16; i++){
+    const f = document.createElement('div');
+    f.className = 'firefly';
+    f.style.left = `${Math.random() * 100}%`;
+    f.style.top = `${Math.random() * 100}%`;
+    f.style.setProperty('--dx1', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dy1', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dx2', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dy2', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dx3', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dy3', `${(Math.random() - 0.5) * 70}px`);
+    f.style.setProperty('--dur', `${6 + Math.random() * 6}s`);
+    f.style.setProperty('--flicker', `${2 + Math.random() * 3}s`);
+    f.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 3}s`;
+    fireflyField.appendChild(f);
+  }
 
   // taruh URL foto buketmu di sini (contoh: "https://.../foto.jpg")
   // kalau dikosongkan, ilustrasi bunga di bawah ini yang dipakai
@@ -764,6 +825,25 @@
   const playerEmptyHint = document.getElementById('playerEmptyHint');
   const nowPlaying = document.getElementById('nowPlaying');
   const mixtapeCard = document.getElementById('mixtapeCard');
+  const noteField = document.getElementById('noteField');
+
+  let noteInterval = null;
+  function spawnNote(){
+    const symbols = ['♪', '♫', '♬'];
+    const n = document.createElement('span');
+    n.className = 'music-note';
+    n.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    n.style.left = `${44 + Math.random() * 12}%`;
+    n.style.setProperty('--nx', `${(Math.random() - 0.5) * 60}px`);
+    n.style.setProperty('--nrot', `${(Math.random() * 40) - 20}deg`);
+    noteField.appendChild(n);
+    setTimeout(() => n.remove(), 2700);
+  }
+  function startNoteFloat(){
+    if (noteInterval) return;
+    spawnNote();
+    noteInterval = setInterval(spawnNote, 750);
+  }
 
   let activeBtn = null;
   let activeRow = null;
@@ -818,6 +898,7 @@
     sidePlayer.classList.add('visible');
     mixtapeCard.classList.add('playing');
     heartBtn.classList.add('liked');
+    startNoteFloat();
   }
 
   // ---- scene 1 -> 2: buka amplop ----
