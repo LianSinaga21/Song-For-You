@@ -1958,10 +1958,501 @@
         rotate(var(--rot));
     }
   }
+
+  /* ============================================================
+     HUG BUTTON + HUG OVERLAY
+     ============================================================ */
+
+  .hug-btn{
+    position: fixed;
+    right: 112px;
+    bottom: 22px;
+    z-index: 32;
+    min-width: 92px;
+    height: 46px;
+    padding: 0 15px;
+    border: 1px solid rgba(214,143,146,.42);
+    border-radius: 999px;
+    background: rgba(250,243,232,.94);
+    color: var(--rose-deep);
+    box-shadow: 0 10px 24px rgba(90,63,48,.16);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(18px) scale(.9);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.2,.8,.3,1), background .18s ease;
+  }
+
+  .stage.scene-card .hug-btn{
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .hug-btn:active{
+    transform: translateY(2px) scale(.95) !important;
+  }
+
+  .hug-btn span{
+    font-size: 12px;
+  }
+
+  .hug-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,244,241,.96) 0%, rgba(250,232,226,.91) 42%, rgba(214,143,146,.72) 100%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .28s ease, visibility .28s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hug-overlay.active{
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .hug-overlay::before,
+  .hug-overlay::after{
+    content: "♡";
+    position: absolute;
+    color: rgba(185,108,114,.25);
+    font-size: 130px;
+    line-height: 1;
+    animation: hugFloatDecor 3s ease-in-out infinite;
+  }
+
+  .hug-overlay::before{
+    left: 7%;
+    top: 15%;
+    transform: rotate(-14deg);
+  }
+
+  .hug-overlay::after{
+    right: 7%;
+    bottom: 13%;
+    font-size: 105px;
+    animation-delay: -.9s;
+  }
+
+  @keyframes hugFloatDecor{
+    0%,100%{ transform: translateY(0) rotate(-14deg) scale(1); }
+    50%{ transform: translateY(-12px) rotate(-8deg) scale(1.05); }
+  }
+
+  .hug-glow{
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.52);
+    filter: blur(16px);
+    opacity: 0;
+    transform: scale(.65);
+  }
+
+  .hug-overlay.active .hug-glow{
+    animation: hugGlow 2.8s ease-in-out infinite;
+  }
+
+  @keyframes hugGlow{
+    0%,100%{ opacity: .28; transform: scale(.75); }
+    50%{ opacity: .7; transform: scale(1.18); }
+  }
+
+  .hug-message{
+    position: relative;
+    z-index: 4;
+    margin-bottom: 12px;
+    font-family: 'Caveat', cursive;
+    font-size: clamp(28px, 6vw, 42px);
+    color: var(--rose-deep);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(12px) scale(.9);
+  }
+
+  .hug-overlay.active .hug-message{
+    animation: hugMessageIn .6s .15s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+
+  @keyframes hugMessageIn{
+    to{ opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .hug-mascot{
+    position: relative;
+    z-index: 5;
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    transform: translateY(90px) scale(.55);
+  }
+
+  .hug-overlay.active .hug-mascot{
+    animation:
+      hugMascotEnter .85s .08s cubic-bezier(.16,1,.3,1) forwards,
+      hugMascotSqueeze 1.1s 1s ease-in-out forwards;
+  }
+
+  @keyframes hugMascotEnter{
+    0%{ opacity: 0; transform: translateY(90px) scale(.55); }
+    55%{ opacity: 1; transform: translateY(-10px) scale(1.06); }
+    78%{ transform: translateY(3px) scale(.96); }
+    100%{ opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes hugMascotSqueeze{
+    0%,100%{ transform: translateY(0) scale(1); }
+    35%{ transform: translateY(-3px) scale(1.08,.94); }
+    60%{ transform: translateY(0) scale(.98,1.02); }
+  }
+
+  .hug-mascot .mascot-body{
+    left: 31px;
+    top: 31px;
+    width: 88px;
+    height: 78px;
+    border-width: 3px;
+    box-shadow: 0 15px 30px rgba(90,63,48,.18);
+  }
+
+  .hug-mascot .mascot-ear{
+    top: 18px;
+    width: 30px;
+    height: 34px;
+    border-width: 3px;
+  }
+
+  .hug-mascot .mascot-ear.left{ left: 34px; }
+  .hug-mascot .mascot-ear.right{ right: 34px; }
+
+  .hug-mascot .mascot-eye{
+    top: 38px;
+    width: 17px;
+    height: 21px;
+  }
+
+  .hug-mascot .mascot-eye.left{ left: 23px; }
+  .hug-mascot .mascot-eye.right{ right: 23px; }
+
+  .hug-mascot .mascot-pupil{
+    left: 4px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+  }
+
+  .hug-mascot .mascot-blush{
+    top: 61px;
+    width: 15px;
+    height: 8px;
+  }
+
+  .hug-mascot .mascot-blush.left{ left: 11px; }
+  .hug-mascot .mascot-blush.right{ right: 11px; }
+
+  .hug-mascot .mascot-mouth{
+    top: 59px;
+    width: 12px;
+    height: 8px;
+  }
+
+  /* Tangan muncul dari samping saat maskot memeluk */
+  .hug-arm{
+    position: absolute;
+    z-index: 2;
+    top: 67px;
+    width: 45px;
+    height: 20px;
+    background: #f7eee3;
+    border: 3px solid #d8bda7;
+    border-radius: 999px;
+    opacity: 0;
+    transform-origin: center;
+    box-shadow: 0 5px 10px rgba(90,63,48,.08);
+  }
+
+  .hug-arm.left{
+    left: 18px;
+    transform: rotate(18deg) translateX(-22px);
+  }
+
+  .hug-arm.right{
+    right: 18px;
+    transform: rotate(-18deg) translateX(22px);
+  }
+
+  .hug-overlay.active .hug-arm.left{
+    animation: hugArmLeft .8s .75s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+
+  .hug-overlay.active .hug-arm.right{
+    animation: hugArmRight .8s .75s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+
+  @keyframes hugArmLeft{
+    0%{ opacity: 0; transform: rotate(18deg) translateX(-22px); }
+    55%{ opacity: 1; transform: rotate(7deg) translateX(3px); }
+    100%{ opacity: 1; transform: rotate(10deg) translateX(0); }
+  }
+
+  @keyframes hugArmRight{
+    0%{ opacity: 0; transform: rotate(-18deg) translateX(22px); }
+    55%{ opacity: 1; transform: rotate(-7deg) translateX(-3px); }
+    100%{ opacity: 1; transform: rotate(-10deg) translateX(0); }
+  }
+
+  .hug-heart{
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    top: 73px;
+    font-size: 38px;
+    color: #e7889a;
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(.4);
+  }
+
+  .hug-overlay.active .hug-heart{
+    animation: hugHeartIn .75s .9s cubic-bezier(.2,.8,.3,1) forwards, hugHeartBeat 1.1s 1.65s ease-in-out infinite;
+  }
+
+  @keyframes hugHeartIn{
+    to{ opacity: 1; transform: translate(-50%, 0) scale(1); }
+  }
+
+  @keyframes hugHeartBeat{
+    0%,100%{ transform: translate(-50%,0) scale(1); }
+    50%{ transform: translate(-50%,-3px) scale(1.16); }
+  }
+
+  /* Saat sedang marah, Hug membujuknya dulu lalu luluh */
+  .hug-mascot.hug-angry .mascot-body{
+    background: #f3e4d8;
+  }
+
+  .hug-mascot.hug-angry .mascot-eye.left{
+    transform: rotate(15deg);
+  }
+
+  .hug-mascot.hug-angry .mascot-eye.right{
+    transform: rotate(-15deg);
+  }
+
+  .hug-mascot.hug-angry .mascot-mouth{
+    width: 15px;
+    height: 6px;
+    border-bottom: none;
+    border-top: 3px solid #7c5c55;
+  }
+
+  .hug-mascot.hug-happy .mascot-eye{
+    height: 8px;
+    top: 43px;
+    border-radius: 50% 50% 0 0;
+  }
+
+  .hug-mascot.hug-happy .mascot-eye.left{ transform: rotate(-8deg); }
+  .hug-mascot.hug-happy .mascot-eye.right{ transform: rotate(8deg); }
+
+  .hug-mascot.hug-happy .mascot-mouth{
+    width: 17px;
+    height: 10px;
+    border-bottom: 3px solid #7c5c55;
+    border-radius: 0 0 50% 50%;
+  }
+
+  .hug-subtext{
+    position: relative;
+    z-index: 4;
+    margin-top: 12px;
+    font-family: 'Caveat', cursive;
+    font-size: clamp(20px, 4.5vw, 27px);
+    color: var(--ink-soft);
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  .hug-overlay.active .hug-subtext{
+    animation: hugSubIn .6s .8s ease forwards;
+  }
+
+  @keyframes hugSubIn{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+
+  .hug-particle{
+    position: absolute;
+    left: 50%;
+    top: 56%;
+    z-index: 3;
+    color: var(--pc);
+    font-size: var(--size);
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    animation: hugParticle var(--dur) var(--delay) cubic-bezier(.16,.75,.25,1) forwards;
+    filter: drop-shadow(0 3px 7px rgba(185,108,114,.12));
+  }
+
+  @keyframes hugParticle{
+    0%{
+      opacity: 0;
+      transform: translate(-50%,-50%) scale(.25) rotate(0deg);
+    }
+    12%{
+      opacity: 1;
+    }
+    100%{
+      opacity: 0;
+      transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1) rotate(var(--rot));
+    }
+  }
+
+  @media (max-width: 720px){
+    .hug-btn{
+      right: 104px;
+      bottom: 16px;
+      min-width: 88px;
+      height: 42px;
+      padding: 0 12px;
+      font-size: 11px;
+    }
+
+    .hug-mascot{
+      width: 130px;
+      height: 130px;
+    }
+
+    .hug-mascot .mascot-body{
+      left: 27px;
+      top: 27px;
+      width: 76px;
+      height: 68px;
+    }
+
+    .hug-mascot .mascot-ear{
+      width: 27px;
+      height: 31px;
+      top: 16px;
+    }
+
+    .hug-mascot .mascot-ear.left{ left: 29px; }
+    .hug-mascot .mascot-ear.right{ right: 29px; }
+
+    .hug-mascot .mascot-eye{
+      top: 33px;
+      width: 15px;
+      height: 19px;
+    }
+
+    .hug-mascot .mascot-eye.left{ left: 20px; }
+    .hug-mascot .mascot-eye.right{ right: 20px; }
+
+    .hug-mascot .mascot-pupil{
+      left: 3px;
+      top: 4px;
+      width: 7px;
+      height: 7px;
+    }
+
+    .hug-mascot .mascot-blush{
+      top: 53px;
+      width: 13px;
+      height: 7px;
+    }
+
+    .hug-mascot .mascot-blush.left{ left: 9px; }
+    .hug-mascot .mascot-blush.right{ right: 9px; }
+
+    .hug-mascot .mascot-mouth{
+      top: 51px;
+      width: 11px;
+      height: 7px;
+    }
+
+    .hug-arm{
+      top: 57px;
+      width: 40px;
+      height: 18px;
+      border-width: 2px;
+    }
+
+    .hug-arm.left{ left: 14px; }
+    .hug-arm.right{ right: 14px; }
+
+    .hug-heart{
+      top: 61px;
+      font-size: 32px;
+    }
+  }
+
 </style>
 </head>
 
 <body>
+
+  <!-- ==========================================================
+       HUG OVERLAY
+       ========================================================== -->
+
+  <div
+    class="hug-overlay"
+    id="hugOverlay"
+    aria-hidden="true"
+  >
+    <div class="hug-glow"></div>
+    <div class="hug-message" id="hugMessage">siniii... 🥺</div>
+
+    <div
+      class="hug-mascot hug-angry"
+      id="hugMascot"
+      aria-hidden="true"
+    >
+      <div class="mascot-ear left"></div>
+      <div class="mascot-ear right"></div>
+
+      <div class="mascot-body">
+        <div class="mascot-eye left">
+          <div class="mascot-pupil"></div>
+        </div>
+        <div class="mascot-eye right">
+          <div class="mascot-pupil"></div>
+        </div>
+        <div class="mascot-blush left"></div>
+        <div class="mascot-blush right"></div>
+        <div class="mascot-mouth"></div>
+        <div class="hug-arm left"></div>
+        <div class="hug-arm right"></div>
+      </div>
+
+      <div class="hug-heart">♥</div>
+    </div>
+
+    <div class="hug-subtext" id="hugSubtext">peluk dulu sebentar 🤍</div>
+  </div>
 
 <div class="stage" id="stage">
 
@@ -2690,6 +3181,19 @@
   >
     ♥
   </div>
+
+  <!-- ==========================================================
+       HUG BUTTON
+       ========================================================== -->
+
+  <button
+    class="hug-btn"
+    id="hugBtn"
+    type="button"
+    aria-label="Peluk maskot"
+  >
+    🫂 <span>Hug</span>
+  </button>
 
   <!-- ==========================================================
        MASKOT LUCU
@@ -4249,6 +4753,263 @@
 
     }
   );
+
+
+  /* ============================================================
+     HUG - MASKOT MARAH -> LULUH -> PELUK
+     ============================================================ */
+
+  const hugBtn = document.getElementById('hugBtn');
+  const hugOverlay = document.getElementById('hugOverlay');
+  const hugMessage = document.getElementById('hugMessage');
+  const hugSubtext = document.getElementById('hugSubtext');
+  const hugMascot = document.getElementById('hugMascot');
+
+  let hugCount = 0;
+  let hugTimer = null;
+
+  const hugMessages = [
+    ['siniii... 🥺', 'peluk dulu sebentar 🤍'],
+    ['jangan marah dong 😭', 'aku cuma mau peluk... 🫂'],
+    ['udah ya marahnya ♡', 'sini, peluk yang erat'],
+    ['hehe, ketangkep 🤭', 'sekarang nggak boleh kabur'],
+    ['peluk dulu baru lanjut ♡', 'aku sayang kamu 🥺']
+  ];
+
+  function createHugParticles(){
+
+    if(!hugOverlay) return;
+
+    const symbols = [
+      '♥','♡','💕','💗','💖','✦','✧','❤'
+    ];
+
+    const particleColors = [
+      '#fff7f7',
+      '#ffd9df',
+      '#f5b8c1',
+      '#ffe9d0',
+      '#ffffff'
+    ];
+
+    for(let i = 0; i < 42; i++){
+
+      const p =
+        document.createElement('span');
+
+      p.className =
+        'hug-particle';
+
+      p.textContent =
+        symbols[
+          Math.floor(
+            Math.random() * symbols.length
+          )
+        ];
+
+      p.style.setProperty(
+        '--x',
+        `${(Math.random() - 0.5) * Math.min(window.innerWidth * 1.25, 720)}px`
+      );
+
+      p.style.setProperty(
+        '--y',
+        `${-70 - Math.random() * Math.min(window.innerHeight * 0.9, 680)}px`
+      );
+
+      p.style.setProperty(
+        '--rot',
+        `${(Math.random() - 0.5) * 110}deg`
+      );
+
+      p.style.setProperty(
+        '--size',
+        `${14 + Math.random() * 24}px`
+      );
+
+      p.style.setProperty(
+        '--dur',
+        `${1.5 + Math.random() * 1.25}s`
+      );
+
+      p.style.setProperty(
+        '--delay',
+        `${Math.random() * 0.45}s`
+      );
+
+      p.style.setProperty(
+        '--pc',
+        particleColors[
+          Math.floor(
+            Math.random() * particleColors.length
+          )
+        ]
+      );
+
+      hugOverlay.appendChild(p);
+
+      setTimeout(
+        () => p.remove(),
+        3300
+      );
+    }
+  }
+
+  function closeHug(){
+
+    if(!hugOverlay) return;
+
+    hugOverlay.classList.remove(
+      'active'
+    );
+
+    hugOverlay.setAttribute(
+      'aria-hidden',
+      'true'
+    );
+
+    clearTimeout(
+      hugTimer
+    );
+
+    setTimeout(
+      () => {
+
+        hugOverlay
+          .querySelectorAll('.hug-particle')
+          .forEach(
+            p => p.remove()
+          );
+
+      },
+      350
+    );
+  }
+
+  function launchHug(){
+
+    if(!hugOverlay || !hugMascot) return;
+
+    hugCount++;
+
+    const message =
+      hugMessages[
+        (hugCount - 1) %
+        hugMessages.length
+      ];
+
+    hugMessage.textContent =
+      message[0];
+
+    hugSubtext.textContent =
+      message[1];
+
+    /*
+      Selalu mulai dari marah sebentar,
+      lalu luluh saat pelukan datang.
+    */
+
+    hugMascot.classList.remove(
+      'hug-happy'
+    );
+
+    hugMascot.classList.add(
+      'hug-angry'
+    );
+
+    hugOverlay.classList.remove(
+      'active'
+    );
+
+    void hugOverlay.offsetWidth;
+
+    hugOverlay.classList.add(
+      'active'
+    );
+
+    hugOverlay.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+
+    createHugParticles();
+
+    /*
+      Setelah masuk, ekspresi marah berubah
+      menjadi senang tepat saat tangan memeluk.
+    */
+
+    setTimeout(
+      () => {
+
+        if(
+          hugOverlay.classList.contains('active')
+        ){
+
+          hugMascot.classList.remove(
+            'hug-angry'
+          );
+
+          hugMascot.classList.add(
+            'hug-happy'
+          );
+
+        }
+
+      },
+      1050
+    );
+
+    clearTimeout(
+      hugTimer
+    );
+
+    hugTimer =
+      setTimeout(
+        closeHug,
+        3900
+      );
+  }
+
+  if(hugBtn){
+
+    hugBtn.addEventListener(
+      'pointerdown',
+      (event) => {
+
+        event.preventDefault();
+
+        launchHug();
+      }
+    );
+  }
+
+  if(hugOverlay){
+
+    hugOverlay.addEventListener(
+      'pointerdown',
+      (event) => {
+
+        if(
+          event.target === hugOverlay
+        ){
+
+          closeHug();
+        }
+      }
+    );
+
+    hugOverlay.addEventListener(
+      'keydown',
+      (event) => {
+
+        if(event.key === 'Escape'){
+
+          closeHug();
+        }
+      }
+    );
+  }
 
 
   /* ============================================================
